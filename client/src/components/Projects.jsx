@@ -1,4 +1,5 @@
 import React from 'react';
+import { ExternalLink } from 'lucide-react';
 
 export default function Projects({ projects, loading }) {
   return (
@@ -34,6 +35,18 @@ export default function Projects({ projects, loading }) {
                       <span key={idx} className="px-3 py-1 border border-[#959177] font-mono text-[10px] text-[#ccc7aa] rounded-full uppercase">{tag}</span>
                     ))}
                   </div>
+                  {project.liveUrl && (
+                    <div className="mt-6 pt-4 border-t border-[#959177]/20 flex justify-end">
+                      <a 
+                        href={project.liveUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="px-4 py-2 bg-[#f5e700] text-[#1f1c00] text-xs font-bold uppercase tracking-wider rounded hover:scale-105 transition-transform flex items-center gap-1.5"
+                      >
+                        View Project <ExternalLink size={12} />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

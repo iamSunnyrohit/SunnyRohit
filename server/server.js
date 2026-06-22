@@ -57,6 +57,14 @@ app.post('/api/projects/seed', async (req, res) => {
             category: "ML / CNN",
             tags: ["CNN", "TensorFlow", "Flask", "Python"],
             imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+            title: "Online Saloon Booking Website",
+            description: "A complete MERN stack application for scheduling and managing salon appointments. Features interactive real-time slot bookings, custom services catalogs, secure authentication flow, and user profile management dashboards.",
+            category: "MERN STACK",
+            tags: ["React.js", "MongoDB", "Express.js", "Node.js"],
+            imageUrl: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80",
+            liveUrl: "https://hair-studio-rouge.vercel.app/"
         }
     ];
 
