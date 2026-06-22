@@ -4,7 +4,7 @@ A decoupled, scalable MERN stack portfolio application. The project is divided i
 
 ---
 
-## 👤 About the Engineer
+## 👤 About Me
 
 **Sunny Rohit Gattu**  
 *Full-Stack Software Engineer & CS Master’s Candidate at Pace University (CGPA: 3.82/4.0)*
