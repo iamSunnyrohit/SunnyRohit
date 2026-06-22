@@ -12,7 +12,8 @@ export default function App() {
 
   // Fetch production portfolio details dynamically from Backend Rest API
   useEffect(() => {
-    fetch('http://localhost:5005/api/projects')
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5005';
+    fetch(`${apiBaseUrl}/api/projects`)
       .then((res) => res.json())
       .then((data) => {
         setProjects(data);
