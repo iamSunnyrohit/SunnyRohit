@@ -56,7 +56,8 @@ app.post('/api/projects/seed', async (req, res) => {
             description: "Directed a team of 4 to build a diagnostic system achieving 85% classification accuracy for dermatological conditions. Orchestrated the preprocessing of 10,000+ images using CNN, and developed a Flask-based API for seamless uploads.",
             category: "ML / CNN",
             tags: ["CNN", "TensorFlow", "Flask", "Python"],
-            imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80"
+            imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80",
+            liveUrl: "https://skin-gaurd-ai.vercel.app/"
         },
         {
             title: "Online Saloon Booking Website",
