@@ -19,7 +19,7 @@ export default function Projects({ projects, loading }) {
           <div className="text-center py-12 text-[#f5e700] font-mono animate-pulse">
             Connecting backend pipeline modules...
           </div>
-        ) : (
+        ) : Array.isArray(projects) && projects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.map((project) => (
               <div key={project._id} className="group border-2 border-[#959177] bg-[#131314] flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(245,231,0,1)]">
@@ -50,6 +50,10 @@ export default function Projects({ projects, loading }) {
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-[#ccc7aa] font-mono border-2 border-dashed border-[#959177]/50 rounded p-8">
+            No projects available at this moment.
           </div>
         )}
       </div>

@@ -15,13 +15,17 @@ export default function App() {
   useEffect(() => {
     const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5005';
     fetch(`${apiBaseUrl}/api/projects`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
-        setProjects(data);
+        setProjects(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((err) => {
         console.error('Error connecting to backend portfolio API:', err);
+        setProjects([]);
         setLoading(false);
       });
   }, []);

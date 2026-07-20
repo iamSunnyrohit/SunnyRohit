@@ -67,7 +67,8 @@ app.get('/api/projects', async (req, res) => {
         }
         res.json(projects);
     } catch (err) {
-        res.status(500).json({ error: 'Server Error fetching projects' });
+        console.error('Error fetching projects from MongoDB:', err);
+        res.status(500).json({ error: 'Server Error fetching projects', details: err.message });
     }
 });
 
