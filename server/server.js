@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // Database Connection
-const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/portfolio';
+const mongoURI = (process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/portfolio').trim();
 
 if (mongoURI) {
     mongoose.connect(mongoURI)
