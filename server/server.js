@@ -12,9 +12,15 @@ app.use(cors());
 app.use(express.json());
 
 // Database Connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully'))
-    .catch(err => console.error('Database connection error:', err));
+const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/portfolio';
+
+if (mongoURI) {
+    mongoose.connect(mongoURI)
+        .then(() => console.log('MongoDB Connected Successfully'))
+        .catch(err => console.error('Database connection error (falling back to initial data if needed):', err.message));
+} else {
+    console.warn('No MONGO_URI specified. Server will run with fallback initial projects.');
+}
 
 // Initial Portfolio Data
 const initialProjects = [
@@ -54,27 +60,68 @@ const initialProjects = [
         tags: ["React.js", "MongoDB", "Express.js", "Node.js"],
         imageUrl: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80",
         liveUrl: "https://hair-studio-rouge.vercel.app/"
+    },
+    {
+    title: "RediLite",
+    description: "A protocol-compliant, high-concurrency Redis server built from scratch in Java 21. Powered by Virtual Threads for lightweight socket scaling, featuring a zero-dependency streaming RESP2 parser, dual-phase TTL eviction, AOF persistence replay, Pub/Sub channels, and atomic transaction pipelining.",
+    category: "Systems & Backend",
+    tags: ["Java 21", "Virtual Threads", "RESP2", "Concurrency", "Networking", "Distributed Systems"],
+    imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
+    liveUrl: "https://github.com/iamSunnyrohit/RediLite"
+    },
+    {
+    title: "CAD-Colab",
+    description: "A real-time collaborative CAD viewer and vector design platform featuring concurrent multi-user editing. Utilizes Operational Transformation (OT) algorithms over WebSockets to ensure conflict-free synchronization of geometric primitives, powered by an optimized HTML5/Konva rendering canvas and spatial indexing for low-latency collaboration.",
+    category: "Full Stack & Graphics",
+    tags: ["React.js", "Node.js", "Socket.IO", "HTML5 Canvas", "Konva.js", "MongoDB"],
+    imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+    liveUrl: "https://github.com/iamSunnyrohit/Cad-colab"
+    },
+    {
+    title: "SnapToCode",
+    description: "A vision-to-frontend development engine powered by NVIDIA NIM microservices. Transpiles screenshots, mockups, and wireframes into clean React + Tailwind CSS components using multi-model VLM orchestration, sub-3s SSE token streaming, Monaco Editor integration, and real-time in-browser Sandpack execution.",
+    category: "AI & Developer Tools",
+    tags: ["React.js", "TypeScript", "FastAPI", "NVIDIA NIM", "Tailwind CSS", "Sandpack"],
+    imageUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80",
+    liveUrl: "https://github.com/iamSunnyrohit/SnapToCode"
+    },
+    {
+    title: "ApexC Studio",
+    description: "A mobile-native C11 compiler and IDE targeting AArch64 (ARM64) architecture built from scratch. Features a zero-dependency handwritten recursive descent parser, an embedded in-memory AST evaluation engine, AAPCS64-compliant GNU assembly code generation, and a high-performance Jetpack Compose UI integrated via Android NDK/JNI.",
+    category: "Compilers & Systems",
+    tags: ["C11", "ARM64", "Assembly", "Kotlin", "Jetpack Compose", "Android NDK"],
+    imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+    liveUrl: "https://github.com/iamSunnyrohit/ApexC"
     }
+
 ];
 
 // API Routes
 // Get all projects (auto-seeds if database is empty)
 app.get('/api/projects', async (req, res) => {
     try {
-        let projects = await Project.find();
-        if (!projects || projects.length === 0) {
-            projects = await Project.insertMany(initialProjects);
+        if (mongoose.connection.readyState === 1) {
+            let projects = await Project.find();
+            if (!projects || projects.length === 0) {
+                projects = await Project.insertMany(initialProjects);
+            }
+            return res.json(projects);
+        } else {
+            console.warn('MongoDB connection not ready, serving initial projects.');
+            return res.json(initialProjects);
         }
-        res.json(projects);
     } catch (err) {
-        console.error('Error fetching projects from MongoDB:', err);
-        res.status(500).json({ error: 'Server Error fetching projects', details: err.message });
+        console.error('Error fetching projects from MongoDB, serving fallback data:', err.message);
+        res.json(initialProjects);
     }
 });
 
 // Seed Initial Portfolio Data (Helper endpoint)
 app.post('/api/projects/seed', async (req, res) => {
     try {
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({ error: 'MongoDB is not connected. Check your MONGO_URI in .env.' });
+        }
         await Project.deleteMany({});
         const seeded = await Project.insertMany(initialProjects);
         res.json({ message: "Database seeded successfully!", data: seeded });

@@ -7,8 +7,8 @@ export default function Navbar() {
         <div className="hidden md:flex gap-6">
           <a className="text-[#f5e700] font-bold border-b-2 border-[#f5e700] pb-1" href="#home">Home</a>
           <a className="text-[#ccc7aa] hover:text-[#f5e700] transition-colors" href="#about">About</a>
-          <a className="text-[#ccc7aa] hover:text-[#f5e700] transition-colors" href="#experience">Experience</a>
           <a className="text-[#ccc7aa] hover:text-[#f5e700] transition-colors" href="#projects">Projects</a>
+          <a className="text-[#ccc7aa] hover:text-[#f5e700] transition-colors" href="#experience">Education</a>
         </div>
       </div>
       <a className="hidden md:block ml-8 px-5 py-1.5 bg-[#f5e700] text-[#1f1c00] text-xs font-bold uppercase tracking-wider rounded-full hover:scale-105 transition-transform" href="#contact">Contact</a>

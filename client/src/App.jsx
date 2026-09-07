@@ -35,8 +35,8 @@ export default function App() {
       <Navbar />
       <Hero />
       <About />
-      <Experience />
       <Projects projects={projects} loading={loading} />
+      <Experience />
       <Contact />
       <Footer />
     </div>
