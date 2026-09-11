@@ -6,27 +6,28 @@ import Experience from './components/Experience';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import { initialProjectsData } from './data/projectsData';
 
 export default function App() {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState(initialProjectsData);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch production portfolio details dynamically from Backend Rest API
+  // Optional dynamic sync from backend if API server is running
   useEffect(() => {
     const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5005';
     fetch(`${apiBaseUrl}/api/projects`)
       .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP status ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        setProjects(Array.isArray(data) ? data : []);
-        setLoading(false);
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data);
+        }
       })
       .catch((err) => {
-        console.error('Error connecting to backend portfolio API:', err);
-        setProjects([]);
-        setLoading(false);
+        // Fallback to frontend static projects data gracefully
+        console.log('Serving frontend local projects dataset:', err.message);
       });
   }, []);
 
