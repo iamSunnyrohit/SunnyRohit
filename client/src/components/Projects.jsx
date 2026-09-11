@@ -3,6 +3,8 @@ import {
   ExternalLink, 
   ChevronLeft, 
   ChevronRight, 
+  ChevronDown,
+  ChevronUp,
   RotateCw, 
   Grid, 
   Layers, 
@@ -53,6 +55,11 @@ export default function Projects({ projects: externalProjects, loading }) {
 
   // Selected Project for Modal Popup
   const [selectedProject, setSelectedProject] = useState(null);
+
+  // Expandable Search Bar & Categories Drawer State
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const searchInputRef = useRef(null);
 
   const animRef = useRef(null);
 
@@ -266,10 +273,10 @@ export default function Projects({ projects: externalProjects, loading }) {
           <div>
             <span className="text-xs font-bold text-[#f5e700] mb-2 uppercase tracking-widest flex items-center gap-2">
               <Sparkles size={14} className="text-[#f5e700] animate-spin" />
-              Interactive Portfolio Showcase
+              Projects Portfolio
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight flex items-center gap-3">
-              Engineering Showcase
+             Portfolio
               <span className="text-xs px-2.5 py-1 rounded-full bg-[#f5e700]/10 border border-[#f5e700]/40 text-[#f5e700] font-mono font-normal">
                 {filteredProjects.length} Projects
               </span>
@@ -304,62 +311,145 @@ export default function Projects({ projects: externalProjects, loading }) {
         </div>
 
         {/* Category Filters & Search Controls */}
-        <div className="mb-10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 border-b border-[#959177]/30 pb-6">
+        <div className="mb-10 border-b border-[#959177]/30 pb-6 flex flex-col gap-3">
           
-          {/* Category Pills Slider */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar max-w-full">
-            {categories.map((cat) => {
-              const count = cat === 'All'
-                ? projectsList.length
-                : projectsList.filter((p) => p.category === cat).length;
+          {/* Controls Bar: Category Reveal Button & Expandable Search Bar */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            
+            {/* Category Reveal Toggle Button */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setShowAllCategories((prev) => !prev)}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 flex items-center gap-2 shadow-md cursor-pointer ${
+                  showAllCategories || activeCategory !== 'All'
+                    ? 'bg-[#f5e700] text-[#1f1c00] shadow-[0_0_15px_rgba(245,231,0,0.35)] scale-105'
+                    : 'bg-[#131314] text-[#ccc7aa] hover:text-white border-2 border-[#959177]/60 hover:border-[#f5e700]'
+                }`}
+                title="Toggle Categories Menu"
+              >
+                <Filter size={14} />
+                <span>{activeCategory === 'All' ? 'Categories' : `Category: ${activeCategory}`}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  showAllCategories || activeCategory !== 'All' ? 'bg-black/20 text-[#1f1c00]' : 'bg-[#0d0e0e] text-[#ccc7aa]'
+                }`}>
+                  {filteredProjects.length}
+                </span>
+                {showAllCategories ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
 
-              const isActive = activeCategory === cat;
-              return (
+              {activeCategory !== 'All' && (
                 <button
-                  key={cat}
                   onClick={() => {
-                    setActiveCategory(cat);
+                    setActiveCategory('All');
                     setCurrentOffset(0);
                     setTargetOffset(0);
                   }}
-                  className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
-                    isActive
-                      ? 'bg-[#f5e700] text-[#1f1c00] shadow-[0_0_15px_rgba(245,231,0,0.35)] scale-105'
-                      : 'bg-[#131314] text-[#ccc7aa] hover:text-white border border-[#959177]/40 hover:border-[#f5e700]/60'
-                  }`}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#131314] text-[#ccc7aa] hover:text-white border border-[#959177]/40 hover:border-red-400 flex items-center gap-1.5 transition-all shadow-sm"
+                  title="Reset category filter to All"
                 >
-                  <span>{cat}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-black/20 text-[#1f1c00]' : 'bg-[#0d0e0e] text-[#ccc7aa]'}`}>
-                    {count}
-                  </span>
+                  <X size={12} /> Reset Filter
                 </button>
-              );
-            })}
+              )}
+            </div>
+
+            {/* Expandable Search Bar */}
+            <div
+              className={`relative flex items-center transition-all duration-300 ease-in-out ${
+                isSearchOpen || searchQuery ? 'w-64 sm:w-80' : 'w-10 hover:w-64 sm:hover:w-80'
+              }`}
+              onMouseEnter={() => setIsSearchOpen(true)}
+              onMouseLeave={() => {
+                if (!searchQuery && document.activeElement !== searchInputRef.current) {
+                  setIsSearchOpen(false);
+                }
+              }}
+            >
+              <div className="relative w-full flex items-center">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onFocus={() => setIsSearchOpen(true)}
+                  onBlur={() => {
+                    if (!searchQuery) setIsSearchOpen(false);
+                  }}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentOffset(0);
+                    setTargetOffset(0);
+                  }}
+                  placeholder="Search tech stack, category, or title..."
+                  className={`w-full bg-[#131314] border-2 border-[#959177]/60 focus:border-[#f5e700] text-white text-xs rounded-full outline-none transition-all duration-300 placeholder:text-[#959177]/70 ${
+                    isSearchOpen || searchQuery
+                      ? 'pl-9 pr-8 py-2 opacity-100 shadow-[0_0_15px_rgba(245,231,0,0.15)]'
+                      : 'pl-9 pr-0 py-2 opacity-0 pointer-events-none'
+                  }`}
+                />
+
+                <button
+                  onClick={() => {
+                    setIsSearchOpen(true);
+                    if (searchInputRef.current) searchInputRef.current.focus();
+                  }}
+                  className={`absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 z-10 ${
+                    isSearchOpen || searchQuery
+                      ? 'text-[#f5e700]'
+                      : 'bg-[#131314] border-2 border-[#959177]/60 hover:border-[#f5e700] text-[#ccc7aa] hover:text-[#f5e700] hover:scale-105 shadow-md'
+                  }`}
+                  title="Search projects"
+                >
+                  <Search size={16} />
+                </button>
+
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      if (searchInputRef.current) searchInputRef.current.focus();
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ccc7aa] hover:text-white transition-colors z-10"
+                    title="Clear search"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Search Input Bar */}
-          <div className="relative min-w-[260px] sm:min-w-[320px]">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#959177]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentOffset(0);
-                setTargetOffset(0);
-              }}
-              placeholder="Search tech stack, category, or title..."
-              className="w-full bg-[#131314] border-2 border-[#959177]/60 focus:border-[#f5e700] text-white pl-10 pr-9 py-1.5 rounded-xl text-xs outline-none transition-all placeholder:text-[#959177]/70"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ccc7aa] hover:text-white"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
+          {/* Revealed Categories Tray (Only visible when pressed/opened) */}
+          {showAllCategories && (
+            <div className="w-full flex items-center gap-2 overflow-x-auto pt-2 pb-1.5 no-scrollbar animate-slide-up bg-[#131314]/90 p-3 rounded-2xl border border-[#959177]/40 backdrop-blur-md">
+              {categories.map((cat) => {
+                const count = cat === 'All'
+                  ? projectsList.length
+                  : projectsList.filter((p) => p.category === cat).length;
+
+                const isActive = activeCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setActiveCategory(cat);
+                      setCurrentOffset(0);
+                      setTargetOffset(0);
+                    }}
+                    className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-[#f5e700] text-[#1f1c00] shadow-[0_0_15px_rgba(245,231,0,0.35)] scale-105'
+                        : 'bg-[#0d0e0e] text-[#ccc7aa] hover:text-white border border-[#959177]/40 hover:border-[#f5e700]/60'
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-black/20 text-[#1f1c00]' : 'bg-[#131314] text-[#ccc7aa]'}`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
         </div>
 
         {loading ? (
